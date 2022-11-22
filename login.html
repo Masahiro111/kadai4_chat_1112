@@ -99,12 +99,25 @@
         <script src="js/firebase.js"></script>
 
         <script>
+
+            function signIn(signInEmail, signInPassword) {
+                auth.signInWithEmailAndPassword(signInEmail, signInPassword)
+                    .then(() => {
+                        console.log("signIn successfully");
+                    })
+                    .catch(error => {
+                        console.log("signIn error");
+                    });
+            }
+
             $('.signin').on('click', function (e) {
                 e.preventDefault();
                 var signInEmail = $('.signInEmail').val();
                 var signInPassword = $('.signInPassword').val();
 
-                alert(signInEmail + signInPassword);
+                signIn(signInEmail, signInPassword);
+
+                // alert(signInEmail + signInPassword);
             });
         </script>
     </body>

@@ -111,15 +111,19 @@
                         .then(() => {
                             verifyEmail(auth.currentUser);
                         })
-                        .catch(error => console.log("there is some error"));
+                        .catch(error => {
+                            console.log("there is some error")
+                        });
                 }
 
                 function verifyEmail(currentUser) {
-                    currentUser.sendEmailVerification().then(() => {
-                        console.log("email send successfully");
-                    }).catch(error => {
-                        console.log("email send error");
-                    });
+                    currentUser.sendEmailVerification()
+                        .then(() => {
+                            console.log("email send successfully");
+                        })
+                        .catch(error => {
+                            console.log("email send error");
+                        });
                 }
 
                 $('.signup').on('click', function (e) {
