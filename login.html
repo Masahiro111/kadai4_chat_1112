@@ -29,12 +29,12 @@
                                        type="email"
                                        autocomplete="email"
                                        required
-                                       class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm">
+                                       class="signInEmail block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm">
                             </div>
                         </div>
 
                         <div>
-                            <label for="password" class="signInPassword block text-sm font-medium text-gray-700">Password</label>
+                            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
                             <div class="mt-1">
                                 <input
                                        id="password"
@@ -42,7 +42,7 @@
                                        type="password"
                                        autocomplete="current-password"
                                        required
-                                       class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm">
+                                       class="signInPassword block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm">
                             </div>
                         </div>
 
@@ -91,10 +91,12 @@
         </div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script>
-            $('.signin').on('click', function () {
-                event.preventDefault();
-                var email = $('#email').val();
-                var password = $('#password').val();
+            $('.signin').on('click', function (e) {
+                e.preventDefault();
+                var signInEmail = $('.signInEmail').val();
+                var signInPassword = $('.signInPassword').val();
+
+                alert(signInEmail + signInPassword);
             });
         </script>
     </body>
