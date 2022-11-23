@@ -20,13 +20,14 @@
             <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
                 <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
                     <form class="space-y-6">
-                        <!-- <div>
+                        <div>
                             <label for="signUpName" class="block text-sm font-medium text-gray-700">Name</label>
                             <div class="mt-1">
                                 <input id="signUpName" name="signUpName" type="text" required class="signUpName block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm">
                             </div>
                         </div>
 
+                        <!-- 
                         <div>
                             <label for="signUpUsername" class="block text-sm font-medium text-gray-700">User name</label>
                             <div class="mt-1">
@@ -106,13 +107,29 @@
 
             $(document).ready(function () {
 
-                function signUp(signUpEmail, signUpPassword) {
+                function signUp(signUpEmail, signUpPassword, signUpName) {
                     auth.createUserWithEmailAndPassword(signUpEmail, signUpPassword)
-                        .then(() => {
+                        .then(async (result) => {
+                            // console.log(result.user.email);
+                            var user = {
+                                avator: '',
+                                email: result.user.email,
+                                username: result.user.email.substring(0, result.user.email.lastIndexOf('@')),
+                                display_name: signUpName,
+                                status: 'offline',
+                            }
+                            var database = firebase.database();
+                            var userCollection = database.ref('/users');
+                            await userCollection.child(result.user.uid).set(user);
                             verifyEmail(auth.currentUser);
+
+
+                            // if (result.user.emailVerified) {
+                            //     window.location.href = "index.html";
+                            // }
                         })
                         .catch(error => {
-                            console.log("there is some error")
+                            console.log(error)
                         });
                 }
 
@@ -130,10 +147,11 @@
                     e.preventDefault();
                     // var signUpName = $('.signUpName').val();
                     // var signUpUserName = $('.signUpUserName').val();
+                    var signUpName = $('.signUpName').val();
                     var signUpEmail = $('.signUpEmail').val();
                     var signUpPassword = $('.signUpPassword').val();
 
-                    signUp(signUpEmail, signUpPassword);
+                    signUp(signUpEmail, signUpPassword, signUpName);
                 });
 
             });

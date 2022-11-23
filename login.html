@@ -104,9 +104,15 @@
 
             function signIn(signInEmail, signInPassword) {
                 auth.signInWithEmailAndPassword(signInEmail, signInPassword)
-                    .then(() => {
+                    .then(async (result) => {
                         // console.log("signIn successfully");
                         if (auth.currentUser.emailVerified) {
+                            var database = firebase.database();
+                            var userCollection = database.ref('/users');
+                            await userCollection.child(result.user.uid).update({
+                                status: 'online',
+                            });
+                            sessionStorage.setItem("authUser", result.user.uid);
                             window.location.href = "index.html";
                         } else {
                             alert("まだメール認証の確認が完了していません。")
@@ -114,6 +120,32 @@
                     })
                     .catch(error => {
                         console.log("signIn error");
+                    });
+            }
+
+            function signInWithGoogle() {
+                var googleProvider = new firebase.auth.GoogleAuthProvider();
+                auth.signInWithPopup(googleProvider)
+                    .then(async (result) => {
+                        // console.log(result.user.email);
+                        var user = {
+                            avator: result.user.photoURL,
+                            email: result.user.email,
+                            username: result.user.email.substring(0, result.user.email.lastIndexOf('@')),
+                            display_name: result.user.displayName,
+                            status: 'online',
+                        }
+                        var database = firebase.database();
+                        var userCollection = database.ref('/users');
+                        await userCollection.child(result.user.uid).set(user);
+                        sessionStorage.setItem("authUser", result.user.uid);
+
+                        if (result.user.emailVerified) {
+                            window.location.href = "index.html";
+                        }
+                    })
+                    .catch((error) => {
+                        console.log(error);
                     });
             }
 
@@ -126,18 +158,9 @@
             });
 
             $('.signInOnGoogle').on('click', function (e) {
-                var googleProvider = new firebase.auth.GoogleAuthProvider();
-                auth.signInWithPopup(googleProvider)
-                    .then((result) => {
-                        // console.log(result.user.email);
-                        if (result.user.emailVerified) {
-                            window.location.href = "index.html";
-                        }
-                    })
-                    .catch((error) => {
-                        console.log(error);
-                    });
+                signInWithGoogle();
             });
+
         </script>
     </body>
 
