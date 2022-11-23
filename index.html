@@ -94,10 +94,10 @@
                         </div>
                         <div class="chat-message clearfix">
                             <div class="input-group mb-0">
+                                <input type="text" class="form-control messageInput" placeholder="Enter text here...">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fa fa-paper-plane"></i></span>
                                 </div>
-                                <input type="text" class="form-control" placeholder="Enter text here...">
                             </div>
                         </div>
                     </div>
@@ -123,20 +123,52 @@
                 $('.bottom').html("");
                 var database = firebase.database();
                 var usersCollection = database.ref('/users');
+                var msgsCollection = database.ref('/msgs');
+                var myId = sessionStorage.getItem('authUser');
+
+                function sendMessage() {
+                    var msg = $(".messageInput").val();
+                    usersCollection.child(myId).on("value", (snapshot) => {
+                        username = snapshot.val().username;
+                    });
+                    var message = {
+                        from: myId,
+                        text: msg,
+                        username: username,
+                        time: new Date().getTime(),
+                    }
+                    msgsCollection.push().set(message);
+                }
+
                 usersCollection.on('child_added', (snapshot) => {
                     console.log(snapshot.val());
                     var userImage = snapshot.val().avator != "" ? '<img src="' + snapshot.val().avator + '" width="48">' : "";
-                    $(".bottom").append(`
-                        <div class="d-flex justify-content-between align-items-center mb-3 individual">
-                            <div class="d-flex flex-row align-items-center">
-                                <div class="image">` + userImage + `</div>
-                                <div class="d-flex flex-column line-height ml-2">
-                                    <span class="font-weight-bold">` + snapshot.val().display_name + `</span>
-                                </div>
-                            </div > <span class="dots"></span>
-                        </div >
-                    <hr>
-                    `);
+
+                    if (!(snapshot.key == myId)) {
+                        $(".bottom").append(`
+                            <div class="d-flex justify-content-between align-items-center mb-3 individual">
+                                <div class="d-flex flex-row align-items-center">
+                                    <div class="image">` + userImage + `</div>
+                                    <div class="d-flex flex-column line-height ml-2">
+                                        <span class="font-weight-bold">` + snapshot.val().display_name + `</span>
+                                    </div>
+                                </div > <span class="dots"></span>
+                            </div >
+                            <hr>
+                        `);
+                    }
+                });
+
+                $(".fa-paper-plane").one("click", function () {
+                    sendMessage();
+                    $(".messageInput").val("");
+                });
+
+                $(".messageInput").keypress(function (e) {
+                    if (e.keyCode == '13') {
+                        sendMessage();
+                        $(".messageInput").val("");
+                    }
                 });
 
             });
