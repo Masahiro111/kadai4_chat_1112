@@ -36,60 +36,6 @@
                         </div>
                         <div class="card-body height3">
                             <ul class="chat-list">
-                                <li class="in">
-                                    <div class="chat-img">
-                                        <img
-                                             alt="Avtar"
-                                             src="https://bootdey.com/img/Content/avatar/avatar1.png" />
-                                    </div>
-                                    <div class="chat-body">
-                                        <div class="chat-message">
-                                            <h5>Jimmy Willams</h5>
-                                            <p>Raw denim heard of them tofu master cleanse</p>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="out">
-                                    <div class="chat-body">
-                                        <div class="chat-message">
-                                            <h5>Serena</h5>
-                                            <p>Next level veard</p>
-                                        </div>
-                                    </div>
-                                    <div class="chat-img">
-                                        <img
-                                             alt="Avtar"
-                                             src="https://bootdey.com/img/Content/avatar/avatar6.png" />
-                                    </div>
-
-                                </li>
-                                <li class="in">
-                                    <div class="chat-img">
-                                        <img
-                                             alt="Avtar"
-                                             src="https://bootdey.com/img/Content/avatar/avatar1.png" />
-                                    </div>
-                                    <div class="chat-body">
-                                        <div class="chat-message">
-                                            <h5 class="name">Jimmy Willams</h5>
-                                            <p>Will stumptown scenes coffee viral.</p>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="out">
-                                    <div class="chat-body">
-                                        <div class="chat-message">
-                                            <h5>Serena</h5>
-                                            <p>Tofu master best deal</p>
-                                        </div>
-                                    </div>
-                                    <div class="chat-img">
-                                        <img
-                                             alt="Avtar"
-                                             src="https://bootdey.com/img/Content/avatar/avatar6.png" />
-                                    </div>
-
-                                </li>
                             </ul>
                         </div>
                         <div class="chat-message clearfix">
@@ -121,6 +67,8 @@
         <script>
             $(document).ready(function () {
                 $('.bottom').html("");
+                $('.chat-list').html("");
+
                 var database = firebase.database();
                 var usersCollection = database.ref('/users');
                 var msgsCollection = database.ref('/msgs');
@@ -129,15 +77,53 @@
                 function sendMessage() {
                     var msg = $(".messageInput").val();
                     usersCollection.child(myId).on("value", (snapshot) => {
-                        username = snapshot.val().username;
+                        display_name = snapshot.val().display_name;
+                        avator_url = snapshot.val().avator;
                     });
                     var message = {
                         from: myId,
                         text: msg,
-                        username: username,
+                        display_name: display_name,
+                        avator: avator_url,
                         time: new Date().getTime(),
                     }
                     msgsCollection.push().set(message);
+                }
+
+                function checkMsg(msg) {
+                    if (msg.from == myId) {
+                        return `
+                            <li class="out">
+                                <div class="chat-body">
+                                    <div class="chat-message">
+                                        <h5>${msg.display_name}</h5>
+                                        <p>${msg.text}</p>
+                                    </div>
+                                </div>
+                                <div class="chat-img">
+                                    <img
+                                            alt="Avtar"
+                                            src="${msg.avator}" />
+                                </div>
+                            </li>
+                        `;
+                    } else {
+                        return `
+                            <li class="in">
+                                <div class="chat-img">
+                                    <img
+                                            alt="Avtar"
+                                            src="${msg.avator}" />
+                                </div>
+                                <div class="chat-body">
+                                    <div class="chat-message">
+                                        <h5>${msg.display_name}</h5>
+                                        <p>${msg.text}</p>
+                                    </div>
+                                </div>
+                            </li>
+                        `;
+                    }
                 }
 
                 usersCollection.on('child_added', (snapshot) => {
@@ -169,6 +155,11 @@
                         sendMessage();
                         $(".messageInput").val("");
                     }
+                });
+
+                msgsCollection.on("child_added", (snapshot) => {
+                    // console.log(snapshot.val());
+                    $(".chat-list").append(checkMsg(snapshot.val()));
                 });
 
             });
